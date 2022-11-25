@@ -5,28 +5,34 @@ import os
 import shutil
 import zipfile
 
+cwd = os.getcwd() 
+cache_dir = os.path.join(cwd, "files\\cache")
+cache_zip_file = os.path.join(cwd, "files\\data.zip")
+
+def main():
+    #print (clean_cache())
+    #print (cache_zip(cache_zip_file, cache_dir))
+    #print (cached_files())
+    print (find_password(cached_files()))
+
 def clean_cache():
-    directory = "cache"
-    parent_dir = r"C:\Users\Daniel\Winc\files" # or os.getcwd() but im being safe and specifying
-    cache_dir = r"C:\Users\Daniel\Winc\files\cache" # for deleting could also be os.getcwd() + "\\cache" but is riskier?
-    path = os.path.join(parent_dir, directory)
     try:
-        os.mkdir(path)
-    except OSError as error: 
+        os.mkdir(cache_dir)
+    except OSError: 
         shutil.rmtree(cache_dir, ignore_errors=False)
-        os.mkdir(path)
+        os.mkdir(cache_dir)
 
 def cache_zip(zip_path, cache_path):
-    clean_cache() #check the cache is clean
+    clean_cache()
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(cache_path)
 
 def cached_files():
     file_list = []
-    for root, dirs, files in os.walk(os.path.abspath(r"C:\Users\Daniel\Winc\files\cache")):
-        for file in files:
-            x = os.path.join(root,file) #generate file path
-            file_list.append(x)  #create list
+    for root, dirs, file in os.walk(os.path.abspath(cache_dir)):
+        for file in file:
+            x = os.path.join(root, file)
+            file_list.append(x)
     return file_list
 
 def find_password(paths):
@@ -34,12 +40,10 @@ def find_password(paths):
         with open(file, "r") as file:
             lines = file.readlines()
             for line in lines:
-                if line.find('password') != -1: #lines that dont have password ignore
-                    x = line.replace("password: ","") #shorten to just password
-                    password = x.replace("\n","") #to solve new line issue theres probably a better way for this
+                if line.find('password') != -1:
+                    x = line.replace("password: ", '')
+                    password = x.rstrip()
                     return password
 
 if __name__ == "__main__":
-    #print (cache_zip(r"C:\Users\Daniel\Winc\files\data.zip", r"C:\Users\Daniel\Winc\files\cache"))
-    #print (cached_files())
-    print (find_password(cached_files()))
+    main()
